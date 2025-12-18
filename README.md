@@ -1,4 +1,4 @@
-# vibedb README
+# VibeDB README
 
 This is the README for your extension "VibeDB". After writing up a brief description, we recommend including the following sections.
 
