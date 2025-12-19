@@ -22,6 +22,11 @@
       {
         "command": "vibedb.helloWorld",
         "title": "Hi all"
+      },
+      {
+        "command": "vibedb.createLocalYdb",
+        "title": "New local-ydb",
+        "icon": "$(add)"
       }
     ],
     "views": {
@@ -30,6 +35,15 @@
           "id": "local-ydb",
           "name": "Local YDB",
           "when": "true"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "vibedb.createLocalYdb",
+          "when": "view == local-ydb",
+          "group": "navigation"
         }
       ]
     }
