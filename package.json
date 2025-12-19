@@ -20,10 +20,6 @@
   "contributes": {
     "commands": [
       {
-        "command": "vibedb.helloWorld",
-        "title": "Hi all"
-      },
-      {
         "command": "vibedb.createLocalYdb",
         "title": "New local-ydb",
         "icon": "$(add)"
