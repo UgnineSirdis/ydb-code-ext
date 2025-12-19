@@ -4,24 +4,34 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 // Tree item for subfolders
 class LocalYdbInstanceItem extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
 		public readonly folderPath: string,
-		public readonly collapsibleState: vscode.TreeItemCollapsibleState
+		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+		public readonly active: boolean,
 	) {
 		super(label, collapsibleState);
 		this.tooltip = this.folderPath;
 		this.contextValue = 'localYdb';
+		if (active) {
+			this.iconPath = new vscode.ThemeIcon('beaker');
+		} else {
+			this.iconPath = new vscode.ThemeIcon('beaker-stop');
+		}
 	}
 
 	// Available icons:
 	// https://code.visualstudio.com/api/references/icons-in-labels
 	//iconPath = new vscode.ThemeIcon('database');
 	//iconPath = new vscode.ThemeIcon('flame');
-	iconPath = new vscode.ThemeIcon('beaker'); // beaker-stop for stopped
+	iconPath = new vscode.ThemeIcon('beaker-stop'); // beaker for running
 }
 
 // Tree data provider for YDB panel
@@ -31,6 +41,48 @@ class LocalYdbTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeIte
 
 	private getLocalYdbPath(): string {
 		return path.join(os.homedir(), 'local-ydb');
+	}
+
+	async getRunningYdbdInstances(): Promise<Set<string>> {
+		try {
+			// Execute ps command to list all processes
+			// On macOS/Linux, use 'ps aux' to get full command lines
+			const { stdout } = await execAsync('ps aux');
+
+			const lines = stdout.split('\n');
+			const instanceNames = new Set<string>();
+			const localYdbBasePath = this.getLocalYdbPath();
+
+			// Pattern to match --yaml-config parameter
+			const yamlConfigPattern = /--yaml-config=([^\s]+)/;
+
+			for (const line of lines) {
+				// Check if this line contains ydbd process
+				if (line.includes('ydbd')) {
+					// Extract --yaml-config parameter value
+					const match = line.match(yamlConfigPattern);
+					if (match && match[1]) {
+						const configPath = match[1];
+
+						// Check if path is within local-ydb directory
+						if (configPath.startsWith(localYdbBasePath + path.sep)) {
+							// Extract the folder name (the part after local-ydb/)
+							const relativePath = configPath.substring(localYdbBasePath.length + 1);
+							const folderName = relativePath.split(path.sep)[0];
+
+							if (folderName) {
+								instanceNames.add(folderName);
+							}
+						}
+					}
+				}
+			}
+
+			return instanceNames;
+		} catch (error) {
+			console.error('Error getting running ydbd instances:', error);
+			return new Set<string>();
+		}
 	}
 
 	refresh(): void {
@@ -50,7 +102,7 @@ class LocalYdbTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeIte
 		// Return subfolders from $HOME/local-ydb
 		const localYdbPath = this.getLocalYdbPath();
 
-		return new Promise((resolve) => {
+		return new Promise(async (resolve) => {
 			// Check if the directory exists
 			if (!fs.existsSync(localYdbPath)) {
 				resolve([]);
@@ -58,6 +110,9 @@ class LocalYdbTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeIte
 			}
 
 			try {
+				// Get running YDB instances
+				const runningInstances = await this.getRunningYdbdInstances();
+
 				// Read directory contents
 				const entries = fs.readdirSync(localYdbPath, { withFileTypes: true });
 
@@ -66,10 +121,12 @@ class LocalYdbTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeIte
 					.filter(entry => entry.isDirectory())
 					.map(entry => {
 						const folderPath = path.join(localYdbPath, entry.name);
+						const active = runningInstances.has(entry.name);
 						return new LocalYdbInstanceItem(
 							entry.name,
 							folderPath,
-							vscode.TreeItemCollapsibleState.None
+							vscode.TreeItemCollapsibleState.None,
+							active,
 						);
 					});
 
