@@ -23,7 +23,16 @@
         "command": "vibedb.helloWorld",
         "title": "Hi all"
       }
-    ]
+    ],
+    "views": {
+      "debug": [
+        {
+          "id": "local-ydb",
+          "name": "Local YDB",
+          "when": "true"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
