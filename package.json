@@ -3,6 +3,7 @@
   "displayName": "VibeDB",
   "description": "Extension for YDB developers that helps to do everyday job",
   "version": "0.0.1",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.105.0"
   },
