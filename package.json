@@ -3,6 +3,7 @@
   "displayName": "VibeDB",
   "description": "Extension for YDB developers that helps to do everyday job",
   "version": "0.0.1",
+  "license": "MIT",
   "icon": "icon.png",
   "repository": {
     "type": "git",
