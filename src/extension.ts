@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { exec } from 'child_process';
+import { exec, spawn } from 'child_process';
 import { promisify } from 'util';
 
 const execAsync = promisify(exec);
@@ -148,6 +148,10 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "VibeDB" is now active!');
 
+	// Create output channel for ya make command output
+	const yaMakeOutputChannel = vscode.window.createOutputChannel('ya make');
+	context.subscriptions.push(yaMakeOutputChannel);
+
 	// Register YDB tree view
 	const localYdbTreeDataProvider = new LocalYdbTreeDataProvider();
 	const ydbTreeView = vscode.window.createTreeView('local-ydb', {
@@ -204,8 +208,62 @@ export function activate(context: vscode.ExtensionContext) {
 				return;
 			}
 
-			// Create the new subfolder
-			fs.mkdirSync(newFolderPath, { recursive: true });
+			// Get the workspace folder
+			const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+			if (!workspaceFolder) {
+				vscode.window.showErrorMessage('No workspace folder open');
+				return;
+			}
+
+			const workspaceFolderPath = workspaceFolder.uri.fsPath;
+
+			// Execute ya make command with output to VS Code console
+			const yaMakeCommand = `${workspaceFolderPath}/ya`;
+			const yaMakeArgs = [
+				'make',
+				'--build', 'relwithdebinfo',
+				`${workspaceFolderPath}/ydb/apps/ydbd`,
+				`${workspaceFolderPath}/ydb/apps/ydb`,
+				`${workspaceFolderPath}/ydb/public/tools/local_ydb`
+			];
+
+			// Show and clear the output channel
+			yaMakeOutputChannel.clear();
+			yaMakeOutputChannel.show(true);
+			yaMakeOutputChannel.appendLine(`Executing: ${yaMakeCommand} ${yaMakeArgs.join(' ')}`);
+			yaMakeOutputChannel.appendLine('');
+
+			// Execute command using spawn for real-time output
+			await new Promise<void>((resolve, reject) => {
+				const process = spawn(yaMakeCommand, yaMakeArgs, {
+					cwd: workspaceFolderPath,
+					shell: true
+				});
+
+				process.stdout.on('data', (data) => {
+					yaMakeOutputChannel.append(data.toString());
+				});
+
+				process.stderr.on('data', (data) => {
+					yaMakeOutputChannel.append(data.toString());
+				});
+
+				process.on('close', (code) => {
+					yaMakeOutputChannel.appendLine('');
+					if (code === 0) {
+						yaMakeOutputChannel.appendLine(`Command completed successfully with exit code ${code}`);
+						resolve();
+					} else {
+						yaMakeOutputChannel.appendLine(`Command failed with exit code ${code}`);
+						reject(new Error(`ya make command failed with exit code ${code}`));
+					}
+				});
+
+				process.on('error', (error) => {
+					yaMakeOutputChannel.appendLine(`Error executing command: ${error.message}`);
+					reject(error);
+				});
+			});
 
 			// Refresh the tree view
 			localYdbTreeDataProvider.refresh();
