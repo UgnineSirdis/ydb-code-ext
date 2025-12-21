@@ -398,6 +398,29 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(refreshLocalYdbCommand);
 
 	// Command to start local YDB instance
+	const buildStartLocalYdbCommand = vscode.commands.registerCommand('vibedb.buildStartLocalYdb', async (item?: LocalYdbInstanceItem) => {
+		const selectedItem = await getSelectedItem(item);
+		if (!selectedItem || !selectedItem.folderPath) {
+			vscode.window.showErrorMessage('Please select a YDB instance');
+			return;
+		}
+
+		try {
+			// TODO: Implement start logic
+			// Example: Execute start command for the YDB instance
+			// const { spawn } = require('child_process');
+			// const startProcess = spawn('ydb', ['start', '--path', selectedItem.folderPath]);
+
+			vscode.window.showInformationMessage(`Building and starting YDB instance: ${selectedItem.label}`);
+			// Refresh tree view
+			localYdbTreeDataProvider.refresh();
+		} catch (error) {
+			vscode.window.showErrorMessage(`Failed to start YDB instance: ${error}`);
+		}
+	});
+	context.subscriptions.push(buildStartLocalYdbCommand);
+
+	// Command to start local YDB instance
 	const startLocalYdbCommand = vscode.commands.registerCommand('vibedb.startLocalYdb', async (item?: LocalYdbInstanceItem) => {
 		const selectedItem = await getSelectedItem(item);
 		if (!selectedItem || !selectedItem.folderPath) {

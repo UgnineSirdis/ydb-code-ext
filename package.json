@@ -22,6 +22,7 @@
       {
         "command": "vibedb.createLocalYdb",
         "title": "New local-ydb",
+        "description": "Builds ydbd, ydb and local_ydb tool and creates a new local-ydb in specified folder",
         "icon": "$(add)"
       },
       {
@@ -30,8 +31,13 @@
         "icon": "$(refresh)"
       },
       {
+        "command": "vibedb.buildStartLocalYdb",
+        "title": "Build -> start",
+        "icon": "$(debug-rerun)"
+      },
+      {
         "command": "vibedb.startLocalYdb",
-        "title": "Start/restart",
+        "title": "Restart without build",
         "icon": "$(notebook-execute)"
       },
       {
@@ -79,29 +85,39 @@
       ],
       "view/item/context": [
         {
-          "command": "vibedb.startLocalYdb",
+          "command": "vibedb.buildStartLocalYdb",
           "when": "view == local-ydb && viewItem == localYdb",
           "group": "inline@1"
         },
         {
-          "command": "vibedb.stopLocalYdb",
+          "command": "vibedb.startLocalYdb",
           "when": "view == local-ydb && viewItem == localYdb",
           "group": "inline@2"
         },
         {
-          "command": "vibedb.deleteLocalYdb",
+          "command": "vibedb.stopLocalYdb",
           "when": "view == local-ydb && viewItem == localYdb",
           "group": "inline@3"
         },
         {
-          "command": "vibedb.editConfigLocalYdb",
+          "command": "vibedb.deleteLocalYdb",
           "when": "view == local-ydb && viewItem == localYdb",
           "group": "inline@4"
         },
         {
-          "command": "vibedb.openLogsLocalYdb",
+          "command": "vibedb.editConfigLocalYdb",
           "when": "view == local-ydb && viewItem == localYdb",
           "group": "inline@5"
+        },
+        {
+          "command": "vibedb.openLogsLocalYdb",
+          "when": "view == local-ydb && viewItem == localYdb",
+          "group": "inline@6"
+        },
+        {
+          "command": "vibedb.buildStartLocalYdb",
+          "when": "view == local-ydb && viewItem == localYdb",
+          "group": "actions"
         },
         {
           "command": "vibedb.startLocalYdb",
