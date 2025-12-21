@@ -293,7 +293,25 @@ async function killYdbdProcess(): Promise<void> {
 			return;
 		}
 
-		await execAsync(`kill ${pids.join(' ')}`);
+		const waitForExit = async (pid: number): Promise<void> => {
+			for (;;) {
+				const { stdout: psOutput } = await execAsync(`ps -p ${pid} -o pid=`);
+				if (psOutput.trim().length === 0) {
+					return;
+				}
+				await new Promise(resolve => setTimeout(resolve, 200));
+			}
+		};
+
+		for (const pid of pids) {
+			try {
+				process.kill(pid, 'SIGTERM');
+			} catch (killError) {
+				console.warn(`Failed to send SIGTERM to pid ${pid}:`, killError);
+				continue;
+			}
+			await waitForExit(pid);
+		}
 	} catch (error) {
 		console.error('Error killing processes for current user:', error);
 	}
