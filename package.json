@@ -2,6 +2,7 @@
   "name": "ydbcode",
   "displayName": "YDB Code",
   "description": "Extension for YDB developers that helps to do everyday job",
+  "publisher": "UgnineSirdis",
   "version": "1.0.0",
   "license": "MIT",
   "icon": "icon.png",
@@ -13,7 +14,10 @@
     "vscode": "^1.105.0"
   },
   "categories": [
-    "Other"
+    "Testing"
+  ],
+  "keywords": [
+    "YDB"
   ],
   "activationEvents": [
     "workspaceContains:ydb/apps/ydbd",
