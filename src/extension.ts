@@ -409,15 +409,14 @@ async function killYdbdProcess(): Promise<void> {
 export async function activate(context: vscode.ExtensionContext) {
 
 	const enabled = await workspaceHasYdbSubfolders();
-	await vscode.commands.executeCommand('setContext', 'vibedb.enabled', enabled);
+	await vscode.commands.executeCommand('setContext', 'ydbcode.enabled', enabled);
 	if (!enabled) {
-		console.log('VibeDB extension disabled: required YDB folders not found in workspace.');
+		console.log('YDB Code extension disabled: required YDB folders not found in workspace.');
 		return;
 	}
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "VibeDB" is now active!');
 	ensureLocalYdbPortDefaults().catch((error) => {
 		console.error('Failed to initialize local YDB port defaults:', error);
 	});
@@ -449,7 +448,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	};
 
 	// Command to stop local YDB instance
-	const stopLocalYdbCommand = vscode.commands.registerCommand('vibedb.stopLocalYdb', async () => {
+	const stopLocalYdbCommand = vscode.commands.registerCommand('ydbcode.stopLocalYdb', async () => {
 		try {
 			await killYdbdProcess();
 
@@ -463,7 +462,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(stopLocalYdbCommand);
 
 	// Command to create a new subfolder
-	const createLocalYdbCommand = vscode.commands.registerCommand('vibedb.createLocalYdb', async () => {
+	const createLocalYdbCommand = vscode.commands.registerCommand('ydbcode.createLocalYdb', async () => {
 		const folderName = await vscode.window.showInputBox({
 			prompt: 'Enter the name of the new local-ydb subfolder',
 			placeHolder: 'subfolder-name',
@@ -514,7 +513,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(createLocalYdbCommand);
 
-	const refreshLocalYdbCommand = vscode.commands.registerCommand('vibedb.refreshLocalYdb', async () => {
+	const refreshLocalYdbCommand = vscode.commands.registerCommand('ydbcode.refreshLocalYdb', async () => {
 		try {
 			// Refresh the tree view
 			localYdbTreeDataProvider.refresh();
@@ -524,7 +523,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(refreshLocalYdbCommand);
 
-	const localYdbInfoCommand = vscode.commands.registerCommand('vibedb.localYdbInfo', async () => {
+	const localYdbInfoCommand = vscode.commands.registerCommand('ydbcode.localYdbInfo', async () => {
 		try {
 			const localYdbConfig = vscode.workspace.getConfiguration('ydb');
 			const defaultLocalYdbPorts = getDefaultLocalYdbPorts();
@@ -565,7 +564,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(localYdbInfoCommand);
 
 	// Command to start local YDB instance
-	const buildStartLocalYdbCommand = vscode.commands.registerCommand('vibedb.buildStartLocalYdb', async (item?: LocalYdbInstanceItem) => {
+	const buildStartLocalYdbCommand = vscode.commands.registerCommand('ydbcode.buildStartLocalYdb', async (item?: LocalYdbInstanceItem) => {
 		const selectedItem = await getSelectedItem(item);
 		if (!selectedItem || !selectedItem.folderPath) {
 			vscode.window.showErrorMessage('Please select a YDB instance');
@@ -592,7 +591,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(buildStartLocalYdbCommand);
 
 	// Command to start local YDB instance
-	const startLocalYdbCommand = vscode.commands.registerCommand('vibedb.startLocalYdb', async (item?: LocalYdbInstanceItem) => {
+	const startLocalYdbCommand = vscode.commands.registerCommand('ydbcode.startLocalYdb', async (item?: LocalYdbInstanceItem) => {
 		const selectedItem = await getSelectedItem(item);
 		if (!selectedItem || !selectedItem.folderPath) {
 			vscode.window.showErrorMessage('Please select a YDB instance');
@@ -617,7 +616,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(startLocalYdbCommand);
 
 	// Command to delete local YDB instance
-	const deleteLocalYdbCommand = vscode.commands.registerCommand('vibedb.deleteLocalYdb', async (item?: LocalYdbInstanceItem) => {
+	const deleteLocalYdbCommand = vscode.commands.registerCommand('ydbcode.deleteLocalYdb', async (item?: LocalYdbInstanceItem) => {
 		const selectedItem = await getSelectedItem(item);
 		if (!selectedItem || !selectedItem.folderPath) {
 			vscode.window.showErrorMessage('Please select a YDB instance');
@@ -653,7 +652,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(deleteLocalYdbCommand);
 
 	// Command to edit config for local YDB instance
-	const editConfigLocalYdbCommand = vscode.commands.registerCommand('vibedb.editConfigLocalYdb', async (item?: LocalYdbInstanceItem) => {
+	const editConfigLocalYdbCommand = vscode.commands.registerCommand('ydbcode.editConfigLocalYdb', async (item?: LocalYdbInstanceItem) => {
 		const selectedItem = await getSelectedItem(item);
 		if (!selectedItem || !selectedItem.folderPath) {
 			vscode.window.showErrorMessage('Please select a YDB instance');
@@ -677,7 +676,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(editConfigLocalYdbCommand);
 
 	// Command to open logs for local YDB instance
-	const openLogsLocalYdbCommand = vscode.commands.registerCommand('vibedb.openLogsLocalYdb', async (item?: LocalYdbInstanceItem) => {
+	const openLogsLocalYdbCommand = vscode.commands.registerCommand('ydbcode.openLogsLocalYdb', async (item?: LocalYdbInstanceItem) => {
 		const selectedItem = await getSelectedItem(item);
 		if (!selectedItem || !selectedItem.folderPath) {
 			vscode.window.showErrorMessage('Please select a YDB instance');

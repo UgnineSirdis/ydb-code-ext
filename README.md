@@ -1,6 +1,6 @@
-# VibeDB extension
+# YDB Code extension
 
-VibeDB extension is extension for YDB developers
+YDB Code extension is extension for YDB developers
 
 ## Features
 

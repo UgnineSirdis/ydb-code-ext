@@ -1,6 +1,6 @@
 # Change Log
 
-All notable changes to the "vibedb" extension will be documented in this file.
+All notable changes to the "ydb-code" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
