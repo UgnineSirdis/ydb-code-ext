@@ -145,6 +145,35 @@
           "group": "actions"
         }
       ]
+    },
+    "configuration": {
+      "title": "YDB",
+      "properties": {
+        "ydb.localPorts.monPort": {
+          "type": "number",
+          "description": "Monitoring port for local YDB. Default is computed from your username."
+        },
+        "ydb.localPorts.grpcPort": {
+          "type": "number",
+          "description": "gRPC port for local YDB. Default is computed from your username."
+        },
+        "ydb.localPorts.grpcTlsPort": {
+          "type": "number",
+          "description": "gRPC TLS port for local YDB. Default is computed from your username."
+        },
+        "ydb.localPorts.icPort": {
+          "type": "number",
+          "description": "Interconnect port for local YDB. Default is computed from your username."
+        },
+        "ydb.localPorts.grpcExtPort": {
+          "type": "number",
+          "description": "External gRPC port for local YDB. Default is computed from your username."
+        },
+        "ydb.localPorts.publicHttpPort": {
+          "type": "number",
+          "description": "Public HTTP port for local YDB. Default is computed from your username."
+        }
+      }
     }
   },
   "scripts": {

@@ -4,10 +4,32 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import * as crypto from 'crypto';
 import { exec, spawn } from 'child_process';
 import { promisify } from 'util';
 
 const execAsync = promisify(exec);
+
+function getDefaultLocalYdbPorts() {
+	const username = process.env.USER ?? process.env.USERNAME ?? 'user';
+	const hash = crypto.createHash('sha256').update('ydb-local-ports').update(username).digest('hex');
+	const hashInt = parseInt(hash.slice(0, 8), 16);
+	const portMin = 10000;
+	const portMax = 65535;
+	const maxOffset = 5;
+	const baseMax = portMax - maxOffset;
+	const rangeSize = baseMax - portMin + 1;
+	const basePort = portMin + (hashInt % rangeSize);
+
+	return {
+		monPort: basePort,
+		grpcPort: basePort + 1,
+		grpcTlsPort: basePort + 2,
+		icPort: basePort + 3,
+		grpcExtPort: basePort + 4,
+		publicHttpPort: basePort + 5
+	};
+}
 
 // Tree item for subfolders
 class LocalYdbInstanceItem extends vscode.TreeItem {
@@ -227,18 +249,30 @@ async function runLocalYdb(localYdbOutputChannel: vscode.OutputChannel, localYdb
 
 	const localYdbCommonDir = path.join(os.homedir(), 'local-ydb');
 
+	const localYdbConfig = vscode.workspace.getConfiguration('ydb');
+	const defaultLocalYdbPorts = getDefaultLocalYdbPorts();
+	const localYdbPorts = {
+		monPort: localYdbConfig.get<number>('localPorts.monPort', defaultLocalYdbPorts.monPort),
+		grpcPort: localYdbConfig.get<number>('localPorts.grpcPort', defaultLocalYdbPorts.grpcPort),
+		grpcTlsPort: localYdbConfig.get<number>('localPorts.grpcTlsPort', defaultLocalYdbPorts.grpcTlsPort),
+		icPort: localYdbConfig.get<number>('localPorts.icPort', defaultLocalYdbPorts.icPort),
+		grpcExtPort: localYdbConfig.get<number>('localPorts.grpcExtPort', defaultLocalYdbPorts.grpcExtPort),
+		publicHttpPort: localYdbConfig.get<number>('localPorts.publicHttpPort', defaultLocalYdbPorts.publicHttpPort)
+	};
+
+
 	// Execute command using spawn for real-time output
 	await new Promise<void>((resolve, reject) => {
 		const process = spawn(localYdbCommand, localYdbArgs, {
 			cwd: localYdbCommonDir,
 			shell: true,
 			env: {
-				MON_PORT: '28040',
-				GRPC_PORT: '17690',
-				GRPC_TLS_PORT: '17691',
-				IC_PORT: '17692',
-				GRPC_EXT_PORT: '17693',
-				PUBLIC_HTTP_PORT: '28041'
+				MON_PORT: String(localYdbPorts.monPort),
+				GRPC_PORT: String(localYdbPorts.grpcPort),
+				GRPC_TLS_PORT: String(localYdbPorts.grpcTlsPort),
+				IC_PORT: String(localYdbPorts.icPort),
+				GRPC_EXT_PORT: String(localYdbPorts.grpcExtPort),
+				PUBLIC_HTTP_PORT: String(localYdbPorts.publicHttpPort)
 			}
 		});
 
