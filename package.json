@@ -35,6 +35,11 @@
         "icon": "$(refresh)"
       },
       {
+        "command": "vibedb.localYdbInfo",
+        "title": "Local YDB connection info",
+        "icon": "$(info)"
+      },
+      {
         "command": "vibedb.buildStartLocalYdb",
         "title": "Build and restart",
         "icon": "$(debug-rerun)"
@@ -85,6 +90,11 @@
           "command": "vibedb.refreshLocalYdb",
           "when": "view == local-ydb",
           "group": "navigation@3"
+        },
+        {
+          "command": "vibedb.localYdbInfo",
+          "when": "view == local-ydb",
+          "group": "navigation@4"
         }
       ],
       "view/item/context": [

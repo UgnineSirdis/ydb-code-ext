@@ -487,6 +487,46 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(refreshLocalYdbCommand);
 
+	const localYdbInfoCommand = vscode.commands.registerCommand('vibedb.localYdbInfo', async () => {
+		try {
+			const localYdbConfig = vscode.workspace.getConfiguration('ydb');
+			const defaultLocalYdbPorts = getDefaultLocalYdbPorts();
+			const localYdbPorts = {
+				monPort: localYdbConfig.get<number>('localYdbPorts.monPort', defaultLocalYdbPorts.monPort),
+				grpcPort: localYdbConfig.get<number>('localYdbPorts.grpcPort', defaultLocalYdbPorts.grpcPort)
+			};
+
+			const grpcUrl = `grpc://localhost:${localYdbPorts.grpcPort}`;
+			const httpUrl = `http://localhost:${localYdbPorts.monPort}`;
+			const copyGrpc = `Copy "${grpcUrl}"`;
+			const copyHttp = `Copy "${httpUrl}"`;
+
+			const selection = await vscode.window.showInformationMessage(
+				'Local YDB connection info',
+				{ modal: true },
+				'Open UI',
+				copyGrpc,
+				copyHttp
+			);
+
+			if (!selection) {
+				return;
+			}
+
+			if (selection === 'Open UI') {
+				await vscode.env.openExternal(vscode.Uri.parse(httpUrl));
+				return;
+			}
+
+			const toCopy = selection === copyGrpc ? grpcUrl : httpUrl;
+			await vscode.env.clipboard.writeText(toCopy);
+			vscode.window.showInformationMessage('Local YDB connection info copied to clipboard');
+		} catch (error) {
+			vscode.window.showErrorMessage(`Failed to copy local YDB connection info: ${error}`);
+		}
+	});
+	context.subscriptions.push(localYdbInfoCommand);
+
 	// Command to start local YDB instance
 	const buildStartLocalYdbCommand = vscode.commands.registerCommand('vibedb.buildStartLocalYdb', async (item?: LocalYdbInstanceItem) => {
 		const selectedItem = await getSelectedItem(item);
