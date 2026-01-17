@@ -25,7 +25,7 @@ YDB Code is extension for YDB developers
 
 ### Download from GitHub
 
-- Download `.vsix` file for the last release from releases page: https://github.com/UgnineSirdis/ydb-code-ext/releases
+- Download `.vsix` file for the latest release from releases page: https://github.com/UgnineSirdis/ydb-code-ext/releases
 - Copy the `.vsix` file to the machine where your YDB workspace lives.
 - Install from the file:
   - VS Code/Cursor UI: `Ctrl+Shift+P` (`⌘+Shift+P`) →  "Extensions: Install from VSIX..." and select the file.
@@ -38,7 +38,7 @@ YDB Code is extension for YDB developers
 - Build the extension package with `make` in the repo root; it produces `ydbcode-<version>.vsix` (a prebuilt `ydbcode-1.0.0.vsix` may already exist).
 - Copy the `.vsix` file to the machine where your YDB workspace lives.
 - Install from the file:
-  - VS Code/Cursor UI: `Ctrl+Shift+P` (`⌘+Shift+P`) →  "Extensions: Install from VSIX..." and select the file.
+  - VS Code/Cursor UI: `Ctrl+Shift+P` (`⌘+Shift+P`) → "Extensions: Install from VSIX..." and select the file.
   - CLI: `code --install-extension /path/to/ydbcode-<version>.vsix` (or `cursor --install-extension ...`).
 
 ## Release Notes
